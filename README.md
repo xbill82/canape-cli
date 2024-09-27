@@ -31,6 +31,7 @@ USAGE
 <!-- commands -->
 * [`canape contract ID`](#canape-contract-id)
 * [`canape help [COMMAND]`](#canape-help-command)
+* [`canape mailchimp EMAIL`](#canape-mailchimp-email)
 * [`canape plugins`](#canape-plugins)
 * [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
 * [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
@@ -48,7 +49,7 @@ Generate a contract for a specific deal
 
 ```
 USAGE
-  $ canape contract ID [-t <value>] [-f pdf|html] [-o <value>]
+  $ canape contract ID [-f pdf|html] [-o <value>] [-t <value>]
 
 ARGUMENTS
   ID  The Notion ID of the deal to generate the contract for
@@ -63,7 +64,7 @@ DESCRIPTION
   Generate a contract for a specific deal
 
 EXAMPLES
-  $ canape contract My-super-deal-69b0e4f5886e4499839aaa469b2547b0
+  $ canape contract <dealId>
 ```
 
 _See code: [src/commands/contract/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/contract/index.ts)_
@@ -87,6 +88,26 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.7/src/commands/help.ts)_
+
+## `canape mailchimp EMAIL`
+
+Search for a contact in Mailchimp by email
+
+```
+USAGE
+  $ canape mailchimp EMAIL
+
+ARGUMENTS
+  EMAIL  Email address to search for
+
+DESCRIPTION
+  Search for a contact in Mailchimp by email
+
+EXAMPLES
+  $ canape mailchimp user@example.com
+```
+
+_See code: [src/commands/mailchimp/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/mailchimp/index.ts)_
 
 ## `canape plugins`
 

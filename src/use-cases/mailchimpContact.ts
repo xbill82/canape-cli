@@ -1,18 +1,29 @@
-import * as mailchimp from '@mailchimp/mailchimp_marketing'
+import axios from 'axios'
 
-import {mailchimpClient} from '../services/mailchimp.api.js'
+import config from '../services/config.js'
+import {MailchimpContact, MailchimpContactResponse, baseUrl} from '../services/mailchimp.api.js'
 
-export async function searchMailchimpContact(
-  email: string,
-): Promise<mailchimp.lists.MembersSuccessResponse | undefined> {
-  const mailchimp = mailchimpClient()
+export async function searchMailchimpContact(email: string): Promise<MailchimpContact> {
+  try {
+    const response = await axios.get(`${baseUrl}/search-members`, {
+      headers: {
+        Authorization: `Bearer ${config.mailchimpApiKey}`,
+      },
+      params: {query: email},
+    })
 
-  const searchResult = await mailchimp.searchMembers.search(email)
+    const searchResult = response.data as MailchimpContactResponse
 
-  if (typeof searchResult === 'object' && 'exact_matches' in searchResult) {
-    return searchResult.exact_matches.members[0]
+    if ('exact_matches' in searchResult && searchResult.exact_matches.members.length > 0) {
+      return searchResult.exact_matches.members[0]
+    }
+
+    throw new Error('Contact not found')
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response) {
+      throw new Error(error.response.data.detail || 'An error occurred while searching for the contact')
+    }
+
+    throw error
   }
-
-  console.error('Error searching for Mailchimp contact:', searchResult.title)
-  return undefined
 }
