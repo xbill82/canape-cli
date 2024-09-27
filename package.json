@@ -8,6 +8,7 @@
   },
   "bugs": "https://github.com/xbill82/canape-cli/issues",
   "dependencies": {
+    "@mailchimp/mailchimp_marketing": "^3.0.80",
     "@notionhq/client": "^2.2.15",
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
@@ -28,6 +29,7 @@
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
     "@types/chai": "^4",
+    "@types/mailchimp__mailchimp_marketing": "^3.0.20",
     "@types/mocha": "^10",
     "@types/node": "^18",
     "chai": "^4",

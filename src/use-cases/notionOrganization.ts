@@ -1,8 +1,14 @@
 import {Client} from '@notionhq/client'
+import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
 
 import {Organization} from '../domain/organization.js'
+import {ThrottleFunction} from '../services/notion.backend.js'
 
-export const fetchOrganizationById = async (backend: Client, throttle: Function, id: string): Promise<Organization> => {
+export const fetchOrganizationById = async (
+  backend: Client,
+  throttle: ThrottleFunction,
+  id: string,
+): Promise<Organization> => {
   console.debug(`🏗️ Fetching Organization with id ${id}...`)
 
   const response = await throttle(() =>
@@ -11,7 +17,5 @@ export const fetchOrganizationById = async (backend: Client, throttle: Function,
     }),
   )
 
-  // console.debug(JSON.stringify(response, null, 2))
-
-  return new Organization(response)
+  return new Organization(response as PageObjectResponse)
 }

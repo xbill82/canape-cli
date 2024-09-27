@@ -1,6 +1,9 @@
 {
   "extends": ["oclif", "oclif-typescript", "prettier"],
   "rules": {
-    "eslint-plugin-unicorn/filename-case": "off"
+    "unicorn/filename-case": "off",
+    "unicorn/prefer-ternary-operator": "off",
+    "camelcase": "off",
+    "import/no-named-as-default-member": "off"
   }
 }
