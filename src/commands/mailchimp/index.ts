@@ -1,30 +1,32 @@
-import {Args, Command} from '@oclif/core'
+import {Command} from '@oclif/core'
 
-import {searchMailchimpContact} from '../../use-cases/mailchimpContact.js'
+import conf from '../../services/config.js'
+import {getBackend, getThrottle} from '../../services/notion.backend.js'
+import {syncMailchimpProfiles} from '../../use-cases/mailchimpSync.js'
 
 export default class MailchimpSearch extends Command {
-  static args = {
-    email: Args.string({description: 'Email address to search for', required: true}),
-  }
+  static args = {}
 
   static description = 'Search for a contact in Mailchimp by email'
 
   static examples = ['<%= config.bin %> <%= command.id %> user@example.com']
 
   async run(): Promise<void> {
-    const {args} = await this.parse(MailchimpSearch)
-
-    this.log(`🔍 Searching for contact with email: ${args.email}`)
+    const backend = getBackend(conf.notionApiKey)
+    const throttle = getThrottle()
 
     try {
-      const contact = await searchMailchimpContact(args.email)
+      this.log(`🔍 Syncing contacts with their Mailchimp profile...`)
+      const {created, updated} = await syncMailchimpProfiles(backend, throttle)
+      console.log(
+        'Updated people:',
+        updated.map((person) => person.name),
+      )
 
-      if (contact) {
-        this.log('✅ Contact found:')
-        this.log(JSON.stringify(contact, null, 2))
-      } else {
-        this.log('❌ Contact not found')
-      }
+      console.log(
+        'Contacts created in Mailchimp:',
+        created.map((person) => person.name),
+      )
     } catch (error) {
       this.error(`An error occurred while searching for the contact: ${(error as Error).message}`, {exit: 1})
     }

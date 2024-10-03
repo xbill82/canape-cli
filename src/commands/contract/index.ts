@@ -2,9 +2,9 @@ import {Args, Command, Flags} from '@oclif/core'
 import path from 'node:path'
 
 import {ContractGenerator} from '../../domain/contract.js'
+import {fetchDealById} from '../../repositories/deal.repository.js'
 import conf from '../../services/config.js'
 import {getBackend, getThrottle} from '../../services/notion.backend.js'
-import {fetchDealById} from '../../use-cases/notionDeal.js'
 
 export default class Contract extends Command {
   static args = {

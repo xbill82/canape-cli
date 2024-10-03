@@ -27,3 +27,6 @@ export const getNumber = (props: any, key: string): number => _.get(props, `${ke
 export const getRichText = (props: any, key: string): string => _.get(props, `${key}.rich_text[0].text.content`)
 export const getTitle = (props: any, key: string): string => _.get(props, `${key}.title[0].text.content`)
 export const getDate = (props: any, key: string): string => _.get(props, `${key}.date.start`) as unknown as string
+export const getEmail = (props: any, key: string): string => _.get(props, `${key}.email`)
+export const getUrl = (props: any, key: string): string => _.get(props, `${key}.url`)
+export const getPhone = (props: any, key: string): string => _.get(props, `${key}.phone_number`)

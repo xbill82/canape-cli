@@ -3,8 +3,8 @@ import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
 
 import {Deal, DealRelations} from '../domain/deal.js'
 import {ThrottleFunction, findPropertyById} from '../services/notion.backend.js'
-import {fetchGigById} from './notionGig.js'
-import {fetchOrganizationById} from './notionOrganization.js'
+import {fetchGigById} from './gig.repository.js'
+import {fetchOrganizationById} from './organization.repository.js'
 
 const gigsKeyId = '%3E%5BC%60'
 const organizationKeyId = '%60pci'

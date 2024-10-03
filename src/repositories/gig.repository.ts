@@ -3,7 +3,7 @@ import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
 
 import {Gig, GigRelations} from '../domain/gig.js'
 import {ThrottleFunction, findPropertyById} from '../services/notion.backend.js'
-import {fetchShowById} from './notionShow.js'
+import {fetchShowById} from './show.repository.js'
 
 const showKeyId = '%2F7eo'
 
