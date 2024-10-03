@@ -7,15 +7,14 @@ A CLI to automate tasks at Le Canapé dans l'Arbre
 [![Downloads/week](https://img.shields.io/npm/dw/canape-cli.svg)](https://npmjs.org/package/canape-cli)
 
 <!-- toc -->
-
-- [Usage](#usage)
-- [Commands](#commands)
+* [canape-cli](#canape-cli)
+* [Usage](#usage)
+* [Commands](#commands)
 <!-- tocstop -->
 
 # Usage
 
 <!-- usage -->
-
 ```sh-session
 $ npm install -g canape-cli
 $ canape COMMAND
@@ -27,26 +26,25 @@ USAGE
   $ canape COMMAND
 ...
 ```
-
 <!-- usagestop -->
 
 # Commands
 
 <!-- commands -->
-
-- [`canape contract ID`](#canape-contract-id)
-- [`canape help [COMMAND]`](#canape-help-command)
-- [`canape mailchimp`](#canape-mailchimp)
-- [`canape plugins`](#canape-plugins)
-- [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
-- [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
-- [`canape plugins install PLUGIN`](#canape-plugins-install-plugin)
-- [`canape plugins link PATH`](#canape-plugins-link-path)
-- [`canape plugins remove [PLUGIN]`](#canape-plugins-remove-plugin)
-- [`canape plugins reset`](#canape-plugins-reset)
-- [`canape plugins uninstall [PLUGIN]`](#canape-plugins-uninstall-plugin)
-- [`canape plugins unlink [PLUGIN]`](#canape-plugins-unlink-plugin)
-- [`canape plugins update`](#canape-plugins-update)
+* [`canape contract ID`](#canape-contract-id)
+* [`canape help [COMMAND]`](#canape-help-command)
+* [`canape mailchimp`](#canape-mailchimp)
+* [`canape new-deals`](#canape-new-deals)
+* [`canape plugins`](#canape-plugins)
+* [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
+* [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
+* [`canape plugins install PLUGIN`](#canape-plugins-install-plugin)
+* [`canape plugins link PATH`](#canape-plugins-link-path)
+* [`canape plugins remove [PLUGIN]`](#canape-plugins-remove-plugin)
+* [`canape plugins reset`](#canape-plugins-reset)
+* [`canape plugins uninstall [PLUGIN]`](#canape-plugins-uninstall-plugin)
+* [`canape plugins unlink [PLUGIN]`](#canape-plugins-unlink-plugin)
+* [`canape plugins update`](#canape-plugins-update)
 
 ## `canape contract ID`
 
@@ -110,6 +108,20 @@ EXAMPLES
 ```
 
 _See code: [src/commands/mailchimp/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/mailchimp/index.ts)_
+
+## `canape new-deals`
+
+Crawls the inbox for new deals and creates them in Notion
+
+```
+USAGE
+  $ canape new-deals
+
+DESCRIPTION
+  Crawls the inbox for new deals and creates them in Notion
+```
+
+_See code: [src/commands/new-deals/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/new-deals/index.ts)_
 
 ## `canape plugins`
 
@@ -399,5 +411,4 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.3.9/src/commands/plugins/update.ts)_
-
 <!-- commandsstop -->
