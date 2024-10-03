@@ -7,7 +7,7 @@ import {syncMailchimpProfiles} from '../../use-cases/mailchimpSync.js'
 export default class MailchimpSearch extends Command {
   static args = {}
 
-  static description = 'Search for a contact in Mailchimp by email'
+  static description = 'Synchronize People with their Mailchimp contact'
 
   static examples = ['<%= config.bin %> <%= command.id %> user@example.com']
 

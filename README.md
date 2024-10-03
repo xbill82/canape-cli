@@ -1,20 +1,21 @@
-canape-cli
-=================
+# canape-cli
 
 A CLI to automate tasks at Le Canapé dans l'Arbre
-
 
 [![oclif](https://img.shields.io/badge/cli-oclif-brightgreen.svg)](https://oclif.io)
 [![Version](https://img.shields.io/npm/v/canape-cli.svg)](https://npmjs.org/package/canape-cli)
 [![Downloads/week](https://img.shields.io/npm/dw/canape-cli.svg)](https://npmjs.org/package/canape-cli)
 
-
 <!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
+
+- [Usage](#usage)
+- [Commands](#commands)
 <!-- tocstop -->
+
 # Usage
+
 <!-- usage -->
+
 ```sh-session
 $ npm install -g canape-cli
 $ canape COMMAND
@@ -26,22 +27,26 @@ USAGE
   $ canape COMMAND
 ...
 ```
+
 <!-- usagestop -->
+
 # Commands
+
 <!-- commands -->
-* [`canape contract ID`](#canape-contract-id)
-* [`canape help [COMMAND]`](#canape-help-command)
-* [`canape mailchimp EMAIL`](#canape-mailchimp-email)
-* [`canape plugins`](#canape-plugins)
-* [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
-* [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
-* [`canape plugins install PLUGIN`](#canape-plugins-install-plugin)
-* [`canape plugins link PATH`](#canape-plugins-link-path)
-* [`canape plugins remove [PLUGIN]`](#canape-plugins-remove-plugin)
-* [`canape plugins reset`](#canape-plugins-reset)
-* [`canape plugins uninstall [PLUGIN]`](#canape-plugins-uninstall-plugin)
-* [`canape plugins unlink [PLUGIN]`](#canape-plugins-unlink-plugin)
-* [`canape plugins update`](#canape-plugins-update)
+
+- [`canape contract ID`](#canape-contract-id)
+- [`canape help [COMMAND]`](#canape-help-command)
+- [`canape mailchimp`](#canape-mailchimp)
+- [`canape plugins`](#canape-plugins)
+- [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
+- [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
+- [`canape plugins install PLUGIN`](#canape-plugins-install-plugin)
+- [`canape plugins link PATH`](#canape-plugins-link-path)
+- [`canape plugins remove [PLUGIN]`](#canape-plugins-remove-plugin)
+- [`canape plugins reset`](#canape-plugins-reset)
+- [`canape plugins uninstall [PLUGIN]`](#canape-plugins-uninstall-plugin)
+- [`canape plugins unlink [PLUGIN]`](#canape-plugins-unlink-plugin)
+- [`canape plugins update`](#canape-plugins-update)
 
 ## `canape contract ID`
 
@@ -89,19 +94,16 @@ DESCRIPTION
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v6.2.7/src/commands/help.ts)_
 
-## `canape mailchimp EMAIL`
+## `canape mailchimp`
 
-Search for a contact in Mailchimp by email
+Synchronize People with their Mailchimp contact
 
 ```
 USAGE
-  $ canape mailchimp EMAIL
-
-ARGUMENTS
-  EMAIL  Email address to search for
+  $ canape mailchimp
 
 DESCRIPTION
-  Search for a contact in Mailchimp by email
+  Synchronize People with their Mailchimp contact
 
 EXAMPLES
   $ canape mailchimp user@example.com
@@ -397,4 +399,5 @@ DESCRIPTION
 ```
 
 _See code: [@oclif/plugin-plugins](https://github.com/oclif/plugin-plugins/blob/v5.3.9/src/commands/plugins/update.ts)_
+
 <!-- commandsstop -->
