@@ -1,10 +1,10 @@
 import {Args, Command, Flags} from '@oclif/core'
 import path from 'node:path'
 
-import {ContractGenerator} from '../../domain/contract.js'
 import {fetchDealById} from '../../repositories/deal.repository.js'
 import conf from '../../services/config.js'
 import {getBackend, getThrottle} from '../../services/notion.backend.js'
+import {generateContract, outputFormat} from '../../use-cases/generateContract.js'
 
 export default class Contract extends Command {
   static args = {
@@ -43,8 +43,10 @@ export default class Contract extends Command {
     this.debug(JSON.stringify(deal, null, 2))
 
     const templatePath = flags.templatePath ? path.resolve(flags.templatePath) : conf.templatePath
-    const generator = new ContractGenerator(deal, templatePath, flags.outputPath)
-    const outputPath = await generator.generateContract(flags.outputFormat)
+    const outputPath = await generateContract(deal, templatePath, {
+      format: flags.outputFormat as outputFormat,
+      outputPath: flags.outputPath,
+    })
 
     this.log(`✅ Contract generated to ${outputPath}`)
   }
