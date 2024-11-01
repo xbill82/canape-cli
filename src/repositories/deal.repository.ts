@@ -8,6 +8,7 @@ import {fetchOrganizationById} from './organization.repository.js'
 
 const gigsKeyId = '%3E%5BC%60'
 const organizationKeyId = '%60pci'
+export const database_id = 'fa11369600934541bd62329dcad2ec16'
 
 export const fetchDealById = async (backend: Client, throttle: ThrottleFunction, id: string): Promise<Deal> => {
   console.debug(`🏗️ Fetching Deal with id ${id}...`)
@@ -40,4 +41,56 @@ export const fetchDealById = async (backend: Client, throttle: ThrottleFunction,
   }
 
   return new Deal(response, relations)
+}
+
+export async function create(backend: Client, deal: Deal, dealName: string, content: string) {
+  const response = await backend.pages.create({
+    children: [
+      {
+        object: 'block',
+        paragraph: {
+          rich_text: [
+            {
+              text: {
+                content,
+              },
+            },
+          ],
+        },
+      },
+    ],
+    parent: {
+      database_id,
+      type: 'database_id',
+    },
+    properties: {
+      Date: {
+        date: {
+          start: deal.date,
+        },
+      },
+      Gigs: {
+        relation: deal.gigs.map((g) => ({id: g.id})),
+      },
+      Name: {
+        title: [
+          {
+            text: {
+              content: dealName,
+            },
+          },
+        ],
+      },
+      Organization: {
+        relation: [
+          {
+            id: deal.organization.id,
+          },
+        ],
+      },
+      // TODO Person relation
+    },
+  })
+
+  return response.id
 }

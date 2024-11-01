@@ -2,10 +2,12 @@ import {Client} from '@notionhq/client'
 import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
 
 import {Gig, GigRelations} from '../domain/gig.js'
+import {Person} from '../domain/person.js'
 import {ThrottleFunction, findPropertyById} from '../services/notion.backend.js'
 import {fetchShowById} from './show.repository.js'
 
 const showKeyId = '%2F7eo'
+export const database_id = '52873389c460496ab652ce3027453753'
 
 export const fetchGigById = async (backend: Client, throttle: ThrottleFunction, id: string): Promise<Gig> => {
   console.debug(`🏗️ Fetching Gig with id ${id}...`)
@@ -31,4 +33,33 @@ export const fetchGigById = async (backend: Client, throttle: ThrottleFunction, 
   }
 
   return new Gig(response, relations)
+}
+
+export async function create(backend: Client, person: Person): Promise<string> {
+  const response = await backend.pages.create({
+    parent: {
+      database_id,
+      type: 'database_id',
+    },
+    properties: {
+      Email: {
+        email: person.email,
+      },
+      Phone: {
+        phone_number: person.phoneNumber,
+      },
+      name: {
+        title: [
+          {
+            text: {
+              content: person.name,
+            },
+          },
+        ],
+      },
+      // TODO relations (organizations, deals)
+    },
+  })
+
+  return response.id
 }

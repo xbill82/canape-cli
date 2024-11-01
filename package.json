@@ -23,6 +23,7 @@
     "imap-simple": "^5.1.0",
     "lodash": "^4.17.21",
     "mailparser": "^3.7.1",
+    "memoize": "^10.0.0",
     "openai": "^4.67.1",
     "pkg-dir": "^8.0.0",
     "puppeteer": "^23.0.2",
