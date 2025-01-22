@@ -22,7 +22,7 @@ const pdfMargin = '40px'
 const initializeHandlebars = () => {
   registerHelpers()
   Handlebars.registerHelper('formatDate', (timestamp: string) => dayjs(timestamp).locale('fr').format('D MMMM YYYY'))
-  Handlebars.registerHelper('formatTime', (timestamp: string) => dayjs(timestamp).locale('fr').format('HH[h]hh'))
+  Handlebars.registerHelper('formatTime', (timestamp: string) => dayjs(timestamp).locale('fr').format('HH[h]mm'))
   Handlebars.registerHelper('uniqTitles', (gigs: Gig[]) => _.uniq(gigs.map((g) => g.showTitle)))
 }
 
