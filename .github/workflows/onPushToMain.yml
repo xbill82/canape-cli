@@ -6,6 +6,28 @@ on:
     branches: [main]
 
 jobs:
+  build-and-push-docker:
+    runs-on: ubuntu-latest
+    env:
+      SCW_REGISTRY: rg.fr-par.scw.cloud/funcscwcanape1nggc45ca
+      SCW_SECRET_KEY: ${{ secrets.SCW_SECRET_KEY }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Scaleway Container Registry
+        run: |
+          docker login $SCW_REGISTRY -u nologin --password-stdin <<< "$SCW_SECRET_KEY"
+
+      - name: Build and push Docker image
+        run: |
+          docker build -t gemma3-4b-inference ./services/inference
+          docker tag gemma3-4b-inference $SCW_REGISTRY/gemma3-4b-inference:latest
+          docker push $SCW_REGISTRY/gemma3-4b-inference:latest
+
   release:
     runs-on: ubuntu-latest
     steps:
