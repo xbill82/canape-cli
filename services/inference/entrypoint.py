@@ -33,7 +33,7 @@ def entity_extraction():
             "http://localhost:8080/v1/completions",
             json=llm_payload,
             headers={'Content-Type': 'application/json'},
-            timeout=30
+            timeout=300
         )
 
         if llm_response.status_code != 200:
