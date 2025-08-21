@@ -40,6 +40,7 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip3 install -r requirements.txt
 
+ARG CACHE_BUST=1
 # Copy the entrypoint.py file
 COPY entrypoint.py .
 
