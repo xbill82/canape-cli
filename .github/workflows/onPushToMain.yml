@@ -15,6 +15,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Download Gemma model
+        run: |
+          curl -L "https://huggingface.co/unsloth/gemma-3-4b-it-GGUF/resolve/main/gemma-3-4b-it-Q8_0.gguf?download=true" -o ./services/inference/gemma-3-4b-it-Q8_0.gguf
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
