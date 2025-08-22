@@ -1,0 +1,12 @@
+# Final stage with ollama
+FROM ollama/ollama:rocm
+
+# Download Gemma3 GGUF model and start ollama server
+RUN ollama serve & sleep 3 && ollama pull hf.co/unsloth/gemma-3-4b-it-GGUF:Q4_K_M
+
+# Expose ports for both ollama-server and the web server
+EXPOSE 11434
+
+# Start both services
+CMD ["ollama", "run", "gemma3-4b-it-Q8_0"]
+
