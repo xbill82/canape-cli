@@ -6,6 +6,30 @@ import {ThrottleFunction} from '../services/notion.backend.js'
 
 export const database_id = '2b43368090ff4153bc4896d7a1abdc94'
 
+export async function searchOrganizationsByName(
+  backend: Client,
+  throttle: ThrottleFunction,
+  searchTerm: string,
+): Promise<Organization[]> {
+  if (!searchTerm.trim()) {
+    return []
+  }
+
+  const response = await throttle(() =>
+    backend.databases.query({
+      database_id,
+      filter: {
+        property: 'Name',
+        title: {
+          contains: searchTerm,
+        },
+      },
+    }),
+  )
+
+  return response.results.map((page) => new Organization(page as PageObjectResponse))
+}
+
 export const fetchOrganizationById = async (
   backend: Client,
   throttle: ThrottleFunction,
@@ -33,12 +57,12 @@ export async function create(backend: Client, organization: Organization): Promi
         rich_text: [
           {
             text: {
-              content: organization.address,
+              content: organization.address ?? '',
             },
           },
         ],
       },
-      name: {
+      Name: {
         title: [
           {
             text: {
@@ -47,16 +71,48 @@ export async function create(backend: Client, organization: Organization): Promi
           },
         ],
       },
-      // Website: {
-      //   url: organization.website
-      // }
-      // Type: {
-      //   multi_select: [
-      //     {
-      //       name: organization.
-      //     }
-      //   ]
-      // }
+      Email: {
+        email: organization.email,
+      },
+      SIRET: {
+        number: organization.SIRET ?? null,
+      },
+      APE: {
+        rich_text: [
+          {
+            text: {
+              content: organization.APE ?? '',
+            },
+          },
+        ],
+      },
+      Licence: {
+        number: organization.licenceNumber ?? null,
+      },
+      LegalPersonName: {
+        rich_text: [
+          {
+            text: {
+              content: organization.legalPersonName ?? '',
+            },
+          },
+        ],
+      },
+      LegalPersonPosition: {
+        rich_text: [
+          {
+            text: {
+              content: organization.legalPersonPosition ?? '',
+            },
+          },
+        ],
+      },
+      Website: {
+        url: organization.website ?? null,
+      },
+      Type: {
+        multi_select: (organization.type ?? []).map((type) => ({name: type})),
+      },
     },
   })
 

@@ -1,16 +1,19 @@
 import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
 
-import {getNumber, getRichText, getTitle} from '../services/notion.backend.js'
+import {getEmail, getMultiSelect, getNumber, getRichText, getTitle, getUrl} from '../services/notion.backend.js'
 
 export class Organization {
-  address: string
+  address?: string
   APE?: string
   id: string
-  legalPersonName: string
-  legalPersonPosition: string
+  legalPersonName?: string
+  legalPersonPosition?: string
   licenceNumber?: number
   name: string
-  SIRET: number
+  SIRET?: number
+  email: string
+  website?: string
+  type?: string[]
 
   constructor(rawOrg: PageObjectResponse) {
     this.id = rawOrg.id
@@ -21,5 +24,8 @@ export class Organization {
     this.legalPersonName = getRichText(rawOrg.properties, 'LegalPersonName')
     this.legalPersonPosition = getRichText(rawOrg.properties, 'LegalPersonPosition')
     this.address = getRichText(rawOrg.properties, 'Address')
+    this.email = getEmail(rawOrg.properties, 'Email')
+    this.website = getUrl(rawOrg.properties, 'Website')
+    this.type = getMultiSelect(rawOrg.properties, 'Type') ?? []
   }
 }

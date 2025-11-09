@@ -20,7 +20,7 @@ $ npm install -g canape-cli
 $ canape COMMAND
 running command...
 $ canape (--version)
-canape-cli/0.0.0 darwin-arm64 node-v20.15.0
+canape-cli/0.0.0 darwin-arm64 node-v20.18.3
 $ canape --help [COMMAND]
 USAGE
   $ canape COMMAND
@@ -35,6 +35,7 @@ USAGE
 * [`canape help [COMMAND]`](#canape-help-command)
 * [`canape mailchimp`](#canape-mailchimp)
 * [`canape new-deals`](#canape-new-deals)
+* [`canape new-organization`](#canape-new-organization)
 * [`canape plugins`](#canape-plugins)
 * [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
 * [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
@@ -122,6 +123,20 @@ DESCRIPTION
 ```
 
 _See code: [src/commands/new-deals/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/new-deals/index.ts)_
+
+## `canape new-organization`
+
+Create a new organization in Notion
+
+```
+USAGE
+  $ canape new-organization
+
+DESCRIPTION
+  Create a new organization in Notion
+```
+
+_See code: [src/commands/new-organization/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/new-organization/index.ts)_
 
 ## `canape plugins`
 

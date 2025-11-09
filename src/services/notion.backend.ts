@@ -30,3 +30,4 @@ export const getDate = (props: any, key: string): string => _.get(props, `${key}
 export const getEmail = (props: any, key: string): string => _.get(props, `${key}.email`)
 export const getUrl = (props: any, key: string): string => _.get(props, `${key}.url`)
 export const getPhone = (props: any, key: string): string => _.get(props, `${key}.phone_number`)
+export const getMultiSelect = (props: any, key: string): string[] => _.get(props, `${key}.multi_select.name`)
