@@ -6,6 +6,10 @@ import {search} from '@inquirer/prompts'
 import {Organization} from '../../domain/organization.js'
 import {create as createOrganization, searchOrganizationsByName} from '../../repositories/organization.repository.js'
 import conf from '../../services/config.js'
+import {
+  getBackend as getFacturationProBackend,
+  getThrottle as getFacturationProThrottle,
+} from '../../services/facturation.pro.backend.js'
 import {getBackend, getThrottle} from '../../services/notion.backend.js'
 
 type NewOrganizationOption = {isNew: true; name: string}
@@ -89,7 +93,27 @@ export default class NewOrganization extends Command {
         type: types.length > 0 ? types : undefined,
       } as Organization
 
-      const organizationId = await createOrganization(backend, organization)
+      let facturationProBackend
+      let facturationProThrottle
+      let firmId
+
+      if (conf.facturationProApiIdentifier && conf.facturationProApiKey && conf.facturationProFirmId) {
+        facturationProBackend = getFacturationProBackend({
+          apiIdentifier: conf.facturationProApiIdentifier,
+          apiKey: conf.facturationProApiKey,
+          firmId: conf.facturationProFirmId,
+        })
+        facturationProThrottle = getFacturationProThrottle()
+        firmId = conf.facturationProFirmId
+      }
+
+      const organizationId = await createOrganization(
+        backend,
+        organization,
+        facturationProBackend,
+        facturationProThrottle,
+        firmId,
+      )
 
       this.log(`✅ Organization created with ID: ${organizationId}`)
     } else {

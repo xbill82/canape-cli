@@ -1,7 +1,13 @@
 import {Client} from '@notionhq/client'
 import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
+import {AxiosInstance} from 'axios'
 
 import {Organization} from '../domain/organization.js'
+import {
+  createCustomer,
+  FacturationProCustomer,
+  ThrottleFunction as FacturationProThrottleFunction,
+} from '../services/facturation.pro.backend.js'
 import {ThrottleFunction} from '../services/notion.backend.js'
 
 export const database_id = '2b43368090ff4153bc4896d7a1abdc94'
@@ -46,8 +52,30 @@ export const fetchOrganizationById = async (
   return new Organization(response as PageObjectResponse)
 }
 
-export async function create(backend: Client, organization: Organization): Promise<string> {
-  const response = await backend.pages.create({
+function mapOrganizationToFacturationProCustomer(organization: Organization): FacturationProCustomer {
+  const customer: FacturationProCustomer = {
+    company_name: organization.name,
+    individual: false,
+    email: organization.email || undefined,
+    website: organization.website || undefined,
+    siret: organization.SIRET ? String(organization.SIRET) : undefined,
+  }
+
+  if (organization.address) {
+    customer.street = organization.address
+  }
+
+  return customer
+}
+
+export async function create(
+  notionBackend: Client,
+  organization: Organization,
+  facturationProBackend?: AxiosInstance,
+  facturationProThrottle?: FacturationProThrottleFunction,
+  firmId?: string,
+): Promise<string> {
+  const response = await notionBackend.pages.create({
     parent: {
       database_id,
       type: 'database_id',
@@ -116,5 +144,16 @@ export async function create(backend: Client, organization: Organization): Promi
     },
   })
 
-  return response.id
+  const notionId = response.id
+
+  if (facturationProBackend && facturationProThrottle && firmId) {
+    try {
+      const customerData = mapOrganizationToFacturationProCustomer(organization)
+      await createCustomer(facturationProBackend, facturationProThrottle, firmId, customerData)
+    } catch (error) {
+      console.error('Failed to create organization in Facturation.pro:', error)
+    }
+  }
+
+  return notionId
 }
