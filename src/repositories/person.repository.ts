@@ -143,7 +143,8 @@ export async function create(
   throttle: ThrottleFunction,
   person: Person,
   organizationId?: string,
-): Promise<string> {
+  dealId?: string,
+): Promise<Person> {
   const properties: Record<string, unknown> = {
     Email: {
       email: person.email || null,
@@ -164,11 +165,13 @@ export async function create(
 
   if (organizationId) {
     properties.Organization = {
-      relation: [
-        {
-          id: organizationId,
-        },
-      ],
+      relation: [{id: organizationId}],
+    }
+  }
+
+  if (dealId) {
+    properties.Deals = {
+      relation: [{id: dealId}],
     }
   }
 
@@ -183,7 +186,9 @@ export async function create(
     }),
   )
 
-  return response.id
+  person.id = response.id
+
+  return person
 }
 
 export async function updatePerson(backend: Client, throttle: ThrottleFunction, person: Person): Promise<void> {

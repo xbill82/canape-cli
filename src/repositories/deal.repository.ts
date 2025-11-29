@@ -43,7 +43,55 @@ export const fetchDealById = async (backend: Client, throttle: ThrottleFunction,
   return new Deal(response, relations)
 }
 
-export async function create(backend: Client, deal: Deal, dealName: string, content: string) {
+export async function create(
+  backend: Client,
+  deal: Deal,
+  dealName: string,
+  content: string,
+  personId?: string,
+): Promise<string> {
+  const properties: Record<string, unknown> = {
+    Date: {
+      date: {
+        start: deal.date,
+      },
+    },
+    Gigs: {
+      relation: deal.gigs.map((g) => ({id: g.id})),
+    },
+    Name: {
+      title: [
+        {
+          text: {
+            content: dealName,
+          },
+        },
+      ],
+    },
+    Organization: {
+      relation: [
+        {
+          id: deal.organization.id,
+        },
+      ],
+    },
+    Status: {
+      status: {
+        name: 'First Contact',
+      },
+    },
+  }
+
+  if (personId) {
+    properties.Person = {
+      relation: [
+        {
+          id: personId,
+        },
+      ],
+    }
+  }
+
   const response = await backend.pages.create({
     children: [
       {
@@ -63,33 +111,8 @@ export async function create(backend: Client, deal: Deal, dealName: string, cont
       database_id,
       type: 'database_id',
     },
-    properties: {
-      Date: {
-        date: {
-          start: deal.date,
-        },
-      },
-      Gigs: {
-        relation: deal.gigs.map((g) => ({id: g.id})),
-      },
-      Name: {
-        title: [
-          {
-            text: {
-              content: dealName,
-            },
-          },
-        ],
-      },
-      Organization: {
-        relation: [
-          {
-            id: deal.organization.id,
-          },
-        ],
-      },
-      // TODO Person relation
-    },
+    // @ts-ignore
+    properties,
   })
 
   return response.id

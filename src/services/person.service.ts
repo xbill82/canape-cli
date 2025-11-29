@@ -21,7 +21,7 @@ export default class PersonService {
     return 'isNew' in value && value.isNew === true
   }
 
-  async createPerson(organizationId?: string): Promise<Person> {
+  async createPerson(organizationId?: string, dealId?: string): Promise<Person> {
     const selected = await search<SearchResult>({
       message: 'Type the person name:',
       source: async (input) => {
@@ -52,7 +52,7 @@ export default class PersonService {
       })
       const phoneNumber = await input({message: 'Phone number (optional):', default: ''})
 
-      const createdPerson: Person = {
+      const newPerson: Person = {
         id: '', // Will be set after creation
         name: name.trim(),
         email: email.trim(),
@@ -62,10 +62,7 @@ export default class PersonService {
         deals: [],
       } as Person
 
-      const personId = await createPerson(this.backend, this.throttle, createdPerson, organizationId)
-
-      createdPerson.id = personId
-      return createdPerson
+      return await createPerson(this.backend, this.throttle, newPerson, organizationId, dealId)
     } else {
       return selected
     }
