@@ -179,3 +179,45 @@ export async function createCustomer(
 
   return response.data
 }
+
+export async function searchCustomers(
+  backend: AxiosInstance,
+  throttle: ThrottleFunction,
+  firmId: string,
+  companyName?: string,
+  siret?: string,
+): Promise<FacturationProCustomerResponse[]> {
+  const params: Record<string, string | number> = {}
+  if (companyName) {
+    params.company_name = companyName
+  }
+  if (siret) {
+    params.siret = siret
+  }
+
+  const url = buildUrl(firmId, 'customers', undefined, params)
+
+  const response = await throttle(async () => {
+    const result = await backend.get<FacturationProResponse<FacturationProCustomerResponse[]>>(url)
+    return result
+  })
+
+  return response.data.data || []
+}
+
+export async function updateCustomer(
+  backend: AxiosInstance,
+  throttle: ThrottleFunction,
+  firmId: string,
+  customerId: number,
+  customer: Partial<FacturationProCustomer>,
+): Promise<FacturationProCustomerResponse> {
+  const url = buildUrl(firmId, 'customers', customerId)
+
+  const response = await throttle(async () => {
+    const result = await backend.put<FacturationProCustomerResponse>(url, customer)
+    return result
+  })
+
+  return response.data
+}

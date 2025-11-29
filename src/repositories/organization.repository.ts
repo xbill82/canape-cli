@@ -6,8 +6,11 @@ import {Organization} from '../domain/organization.js'
 import {
   createCustomer,
   FacturationProCustomer,
+  searchCustomers,
   ThrottleFunction as FacturationProThrottleFunction,
+  updateCustomer,
 } from '../services/facturation.pro.backend.js'
+import {Person} from '../domain/person.js'
 import {ThrottleFunction} from '../services/notion.backend.js'
 
 export const database_id = '2b43368090ff4153bc4896d7a1abdc94'
@@ -68,13 +71,82 @@ function mapOrganizationToFacturationProCustomer(organization: Organization): Fa
   return customer
 }
 
+function splitName(name: string): {firstName: string; lastName: string} {
+  const nameParts = name.split(' ')
+  const firstName = nameParts[0]
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : ''
+  return {firstName, lastName}
+}
+
+function mapPersonToFacturationProCustomerUpdate(person: Person): Partial<FacturationProCustomer> {
+  const {firstName, lastName} = splitName(person.name)
+  const update: Partial<FacturationProCustomer> = {}
+
+  if (firstName) {
+    update.first_name = firstName
+  }
+  if (lastName) {
+    update.last_name = lastName
+  }
+  if (person.email) {
+    update.email = person.email
+  }
+  if (person.phoneNumber) {
+    update.phone = person.phoneNumber
+  }
+
+  return update
+}
+
+export async function updateOrganizationWithPerson(
+  organization: Organization,
+  person: Person,
+  facturationProBackend?: AxiosInstance,
+  facturationProThrottle?: FacturationProThrottleFunction,
+  firmId?: string,
+): Promise<void> {
+  if (!facturationProBackend || !facturationProThrottle || !firmId) {
+    return
+  }
+
+  try {
+    let customerId: number
+
+    if (organization.facturationProId) {
+      customerId = organization.facturationProId
+    } else {
+      const customers = await searchCustomers(
+        facturationProBackend,
+        facturationProThrottle,
+        firmId,
+        organization.name,
+        organization.SIRET ? String(organization.SIRET) : undefined,
+      )
+
+      if (customers.length === 0) {
+        console.warn(`No Facturation.pro customer found for organization "${organization.name}"`)
+        return
+      }
+
+      customerId = customers[0].id
+    }
+
+    const updateData = mapPersonToFacturationProCustomerUpdate(person)
+
+    await updateCustomer(facturationProBackend, facturationProThrottle, firmId, customerId, updateData)
+    console.log(`Updated Facturation.pro customer ${customerId} with person data`)
+  } catch (error) {
+    console.error('Failed to update organization in Facturation.pro with person data:', error)
+  }
+}
+
 export async function create(
   notionBackend: Client,
   organization: Organization,
   facturationProBackend?: AxiosInstance,
   facturationProThrottle?: FacturationProThrottleFunction,
   firmId?: string,
-): Promise<string> {
+): Promise<Organization> {
   const response = await notionBackend.pages.create({
     parent: {
       database_id,
@@ -144,16 +216,27 @@ export async function create(
     },
   })
 
-  const notionId = response.id
+  organization.id = response.id
 
   if (facturationProBackend && facturationProThrottle && firmId) {
     try {
       const customerData = mapOrganizationToFacturationProCustomer(organization)
-      await createCustomer(facturationProBackend, facturationProThrottle, firmId, customerData)
+      const customerResponse = await createCustomer(facturationProBackend, facturationProThrottle, firmId, customerData)
+
+      await notionBackend.pages.update({
+        page_id: organization.id,
+        properties: {
+          FacturationProId: {
+            number: customerResponse.id,
+          },
+        },
+      })
+
+      organization.facturationProId = customerResponse.id
     } catch (error) {
       console.error('Failed to create organization in Facturation.pro:', error)
     }
   }
 
-  return notionId
+  return organization
 }

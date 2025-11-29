@@ -86,11 +86,36 @@ export async function createMailchimpContact(person: Person): Promise<string | u
   }
 }
 
-export async function findPersonsWithEmptyMailchimpProfiles(backend: Client, throttle: ThrottleFunction) {
-  const databaseId = '52873389c460496ab652ce3027453753'
+export const database_id = '52873389c460496ab652ce3027453753'
+
+export async function searchPersonsByName(
+  backend: Client,
+  throttle: ThrottleFunction,
+  searchTerm: string,
+): Promise<Person[]> {
+  if (!searchTerm.trim()) {
+    return []
+  }
+
   const response = await throttle(() =>
     backend.databases.query({
-      database_id: databaseId,
+      database_id,
+      filter: {
+        property: 'Name',
+        title: {
+          contains: searchTerm,
+        },
+      },
+    }),
+  )
+
+  return response.results.map((page) => new Person(page as PageObjectResponse))
+}
+
+export async function findPersonsWithEmptyMailchimpProfiles(backend: Client, throttle: ThrottleFunction) {
+  const response = await throttle(() =>
+    backend.databases.query({
+      database_id,
       filter: {
         and: [
           {
@@ -111,6 +136,54 @@ export async function findPersonsWithEmptyMailchimpProfiles(backend: Client, thr
   )
 
   return response.results.map((page) => new Person(page as PageObjectResponse))
+}
+
+export async function create(
+  backend: Client,
+  throttle: ThrottleFunction,
+  person: Person,
+  organizationId?: string,
+): Promise<string> {
+  const properties: Record<string, unknown> = {
+    Email: {
+      email: person.email || null,
+    },
+    Phone: {
+      phone_number: person.phoneNumber || null,
+    },
+    Name: {
+      title: [
+        {
+          text: {
+            content: person.name,
+          },
+        },
+      ],
+    },
+  }
+
+  if (organizationId) {
+    properties.Organization = {
+      relation: [
+        {
+          id: organizationId,
+        },
+      ],
+    }
+  }
+
+  const response = await throttle(() =>
+    backend.pages.create({
+      parent: {
+        database_id,
+        type: 'database_id',
+      },
+      // @ts-ignore
+      properties,
+    }),
+  )
+
+  return response.id
 }
 
 export async function updatePerson(backend: Client, throttle: ThrottleFunction, person: Person): Promise<void> {

@@ -1,14 +1,18 @@
 import {Client} from '@notionhq/client'
 import {Organization} from '../domain/organization.js'
-import {ThrottleFunction} from './facturation.pro.backend.js'
+import {ThrottleFunction} from './notion.backend.js'
 import input from '@inquirer/input'
 import confirm from '@inquirer/confirm'
-import {search} from '@inquirer/prompts'
+import {search, checkbox} from '@inquirer/prompts'
 import {
   getBackend as getFacturationProBackend,
   getThrottle as getFacturationProThrottle,
 } from './facturation.pro.backend.js'
-import {searchOrganizationsByName, create as createOrganization} from '../repositories/organization.repository.js'
+import {
+  searchOrganizationsByName,
+  create as createOrganization,
+  database_id,
+} from '../repositories/organization.repository.js'
 import conf from '../services/config.js'
 
 type NewOrganizationOption = {isNew: true; name: string}
@@ -25,6 +29,26 @@ export default class OrganizationService {
 
   private isNewOrganization(value: SearchResult): value is NewOrganizationOption {
     return 'isNew' in value && value.isNew === true
+  }
+
+  private async getOrganizationTypeOptions(): Promise<string[]> {
+    try {
+      const response = await this.throttle(() =>
+        this.backend.databases.retrieve({
+          database_id,
+        }),
+      )
+
+      const typeProperty = response.properties.Type
+      if (typeProperty && typeProperty.type === 'multi_select' && typeProperty.multi_select) {
+        return typeProperty.multi_select.options.map((option) => option.name)
+      }
+
+      return []
+    } catch (error) {
+      console.error('Failed to fetch organization type options from Notion:', error)
+      return []
+    }
   }
 
   async createOrganization(): Promise<Organization> {
@@ -69,19 +93,16 @@ export default class OrganizationService {
 
       const website = await input({message: 'Website (optional):', default: ''})
 
-      const types: string[] = []
-      let addType = true
-      while (addType) {
-        const type = await input({message: 'Type (optional, press Enter to skip):', default: ''})
-        if (type.trim()) {
-          types.push(type.trim())
-          addType = await confirm({message: 'Add another type?', default: false})
-        } else {
-          addType = false
-        }
-      }
+      const typeOptions = await this.getOrganizationTypeOptions()
+      const types: string[] =
+        typeOptions.length > 0
+          ? await checkbox({
+              message: 'Type (optional, select one or more):',
+              choices: typeOptions.map((option) => ({name: option, value: option})),
+            })
+          : []
 
-      const createdOrganization: Organization = {
+      const newOrganization: Organization = {
         id: '', // Will be set after creation
         name: name.trim(),
         email: email.trim(),
@@ -93,6 +114,7 @@ export default class OrganizationService {
         licenceNumber,
         website: website.trim() || undefined,
         type: types.length > 0 ? types : undefined,
+        facturationProId: undefined,
       } as Organization
 
       let facturationProBackend
@@ -109,16 +131,13 @@ export default class OrganizationService {
         firmId = conf.facturationProFirmId
       }
 
-      const organizationId = await createOrganization(
+      return await createOrganization(
         this.backend,
-        createdOrganization,
+        newOrganization,
         facturationProBackend,
         facturationProThrottle,
         firmId,
       )
-
-      createdOrganization.id = organizationId
-      return createdOrganization
     } else {
       return selected
     }

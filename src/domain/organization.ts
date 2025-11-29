@@ -14,6 +14,7 @@ export class Organization {
   email: string
   website?: string
   type?: string[]
+  facturationProId?: number
 
   constructor(rawOrg: PageObjectResponse) {
     this.id = rawOrg.id
@@ -27,5 +28,6 @@ export class Organization {
     this.email = getEmail(rawOrg.properties, 'Email')
     this.website = getUrl(rawOrg.properties, 'Website')
     this.type = getMultiSelect(rawOrg.properties, 'Type') ?? []
+    this.facturationProId = getNumber(rawOrg.properties, 'FacturationProId')
   }
 }
