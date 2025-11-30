@@ -115,15 +115,16 @@ export default class DealService {
 
     if (shouldCreateGig) {
       const show = await this.gigService.selectShow()
+      const timestamp = await input({message: 'Date/Time (YYYY-MM-DD or YYYY-MM-DDTHH:mm):'})
       const city = await input({message: 'City (optional):', default: ''})
-      const timestamp = await input({message: 'Date/Time (optional, YYYY-MM-DD or YYYY-MM-DDTHH:mm):', default: ''})
 
       gigId = await this.gigService.createGig({
+        gigTitle: `${show.title} @ ${city.trim()} / ${timestamp.trim()}`,
         show,
         dealId,
         organizationId: organization.id,
         city: city.trim() || undefined,
-        timestamp: timestamp.trim() || undefined,
+        timestamp: timestamp.trim(),
       })
 
       await this.backend.pages.update({

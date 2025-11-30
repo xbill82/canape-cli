@@ -5,16 +5,18 @@ import {Gig, GigRelations} from '../domain/gig.js'
 import {Show} from '../domain/show.js'
 import {ThrottleFunction, findPropertyById} from '../services/notion.backend.js'
 import {fetchShowById} from './show.repository.js'
+import {title} from 'process'
 
 const showKeyId = '%2F7eo'
-export const database_id = '52873389c460496ab652ce3027453753'
+export const database_id = '13b920e1f55247fb9a7708a9c29faaa7'
 
 export type CreateGigData = {
-  show: Show
-  dealId?: string
+  gigTitle: string
+  dealId: string
+  timestamp: string
+  show?: Show
   organizationId?: string
   city?: string
-  timestamp?: string
   customTitle?: string
 }
 
@@ -46,13 +48,25 @@ export const fetchGigById = async (backend: Client, throttle: ThrottleFunction, 
 
 export async function create(backend: Client, throttle: ThrottleFunction, gigData: CreateGigData): Promise<string> {
   const properties: Record<string, unknown> = {
-    Show: {
+    Title: {
+      title: [
+        {
+          text: {
+            content: gigData.gigTitle,
+          },
+        },
+      ],
+    },
+  }
+
+  if (gigData.show) {
+    properties.Show = {
       relation: [
         {
           id: gigData.show.id,
         },
       ],
-    },
+    }
   }
 
   if (gigData.dealId) {
@@ -66,7 +80,7 @@ export async function create(backend: Client, throttle: ThrottleFunction, gigDat
   }
 
   if (gigData.organizationId) {
-    properties.Organization = {
+    properties.Organizer = {
       relation: [
         {
           id: gigData.organizationId,
