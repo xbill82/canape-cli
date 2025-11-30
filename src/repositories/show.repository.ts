@@ -1,5 +1,5 @@
 import {Client} from '@notionhq/client'
-import {PageObjectResponse} from '@notionhq/client/build/src/api-endpoints.js'
+import {PageObjectResponse, QueryDatabaseParameters} from '@notionhq/client/build/src/api-endpoints.js'
 
 import {Show} from '../domain/show.js'
 import {ThrottleFunction} from '../services/notion.backend.js'
@@ -10,21 +10,22 @@ export const database_id = 'ca3d9449a5b14e11a41d4b051085e8b8'
 export async function searchShowsByTitle(
   backend: Client,
   throttle: ThrottleFunction,
-  searchTerm: string,
+  searchTerm?: string,
 ): Promise<Show[]> {
-  if (!searchTerm.trim()) {
-    return []
+  let filter: QueryDatabaseParameters['filter'] | undefined = undefined
+  if (searchTerm && searchTerm.trim()) {
+    filter = {
+      property: 'Title',
+      title: {
+        contains: searchTerm.trim(),
+      },
+    }
   }
 
   const response = await throttle(() =>
     backend.databases.query({
       database_id,
-      filter: {
-        property: 'Title',
-        title: {
-          contains: searchTerm,
-        },
-      },
+      filter,
     }),
   )
 

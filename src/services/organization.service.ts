@@ -51,9 +51,9 @@ export default class OrganizationService {
     }
   }
 
-  async createOrganization(): Promise<Organization> {
+  async findOrCreateOrganization(message: string = 'Type the organization name:'): Promise<Organization> {
     const selected = await search<SearchResult>({
-      message: 'Type the organization name:',
+      message: message,
       source: async (input) => {
         if (!input || input.trim().length === 0) {
           return []

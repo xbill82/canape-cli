@@ -11,16 +11,13 @@ import {Deal} from '../domain/deal.js'
 import OrganizationService from './organization.service.js'
 import PersonService from './person.service.js'
 import GigService from './gig.service.js'
-import {create as createDeal} from '../repositories/deal.repository.js'
+import {create as createDeal, fetchDealById} from '../repositories/deal.repository.js'
 import {updateOrganizationWithPerson} from '../repositories/organization.repository.js'
 import {
   getBackend as getFacturationProBackend,
   getThrottle as getFacturationProThrottle,
 } from './facturation.pro.backend.js'
 import conf from './config.js'
-
-type NewOrganizationOption = {isNew: true; name: string}
-type SearchResult = Organization | NewOrganizationOption
 
 export type CreateDealResult = {
   dealId: string
@@ -45,13 +42,13 @@ export default class DealService {
     this.gigService = new GigService(backend, throttle)
   }
 
-  async createDeal(): Promise<CreateDealResult> {
+  async createDeal(): Promise<Deal> {
     const dealTitle = await input({
       message: 'Deal title:',
       validate: (value) => value.trim().length > 0 || 'Deal title is required',
     })
 
-    const organization = await this.organizationService.createOrganization()
+    const organization = await this.organizationService.findOrCreateOrganization('Who is the organizer?')
 
     const today = dayjs().format('YYYY-MM-DD')
     const minimalDeal: Deal = {
@@ -61,22 +58,26 @@ export default class DealService {
       deadlineForCommElements: dayjs(today).subtract(20, 'day').format('D MMMM YYYY'),
       gigs: [],
       organization,
+      url: '',
     } as Deal
 
-    const dealId = await createDeal(this.backend, minimalDeal, dealTitle.trim(), '')
+    const deal = await createDeal(this.backend, minimalDeal, dealTitle.trim(), '')
+    const createdDeal = await fetchDealById(this.backend, this.throttle, deal.id)
+
+    deal.url = createdDeal.url
 
     const shouldCreatePerson = await confirm({
-      message: 'Do you want to create a person for this deal?',
+      message: 'Is there a decision maker for this deal?',
       default: false,
     })
 
     let person: Person | undefined
 
     if (shouldCreatePerson) {
-      person = await this.personService.createPerson(organization.id, dealId)
+      person = await this.personService.createPerson(organization.id, deal.id)
 
       await this.backend.pages.update({
-        page_id: dealId,
+        page_id: deal.id,
         properties: {
           'Decision-maker': {
             relation: [
@@ -121,14 +122,14 @@ export default class DealService {
       gigId = await this.gigService.createGig({
         gigTitle: `${show.title} @ ${city.trim()} / ${timestamp.trim()}`,
         show,
-        dealId,
+        dealId: deal.id,
         organizationId: organization.id,
         city: city.trim() || undefined,
         timestamp: timestamp.trim(),
       })
 
       await this.backend.pages.update({
-        page_id: dealId,
+        page_id: deal.id,
         properties: {
           Gigs: {
             relation: [
@@ -141,12 +142,6 @@ export default class DealService {
       })
     }
 
-    return {
-      dealId,
-      dealTitle: dealTitle.trim(),
-      organization,
-      person,
-      gigId,
-    }
+    return deal
   }
 }

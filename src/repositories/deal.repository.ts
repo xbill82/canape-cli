@@ -49,7 +49,7 @@ export async function create(
   dealName: string,
   content: string,
   personId?: string,
-): Promise<string> {
+): Promise<Deal> {
   const properties: Record<string, unknown> = {
     Date: {
       date: {
@@ -115,5 +115,7 @@ export async function create(
     properties,
   })
 
-  return response.id
+  deal.id = response.id
+
+  return deal
 }

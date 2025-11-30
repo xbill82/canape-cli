@@ -20,11 +20,13 @@ export class Deal {
   gigs: Gig[]
   id: string
   organization: Organization
+  url: string
 
   constructor(rawDeal: PageObjectResponse, relations: DealRelations) {
     const amountProp = findPropertyById(rawDeal.properties, amountKeyId)
 
     this.id = rawDeal.id
+    this.url = rawDeal.url
     this.amount = amountProp.number
     this.date = getDate(rawDeal.properties, 'Date')
 

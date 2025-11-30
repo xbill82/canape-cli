@@ -20,7 +20,7 @@ export default class NewOrganization extends Command {
     const throttle = getThrottle()
 
     const organizationService = new OrganizationService(backend, throttle)
-    const organization = await organizationService.createOrganization()
+    const organization = await organizationService.findOrCreateOrganization()
 
     this.log('\n📋 Organization Details:')
     this.log(`   ID: ${organization.id}`)
