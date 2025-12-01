@@ -2,6 +2,7 @@ import {Mistral} from '@mistralai/mistralai'
 import * as components from '@mistralai/mistralai/models/components/index.js'
 import {ParsedChatCompletionRequest} from '@mistralai/mistralai/extra/structChat.js'
 import {z} from 'zod'
+import {startActiveObservation} from '@langfuse/tracing'
 
 import config from './config.js'
 
@@ -33,7 +34,7 @@ export class MistralAIService {
   private _lazyClient: Mistral | null = null
 
   constructor({
-    model = 'mistral-large-latest',
+    model = 'mistral-medium-latest',
     temperature = 0.2,
   }: {
     model?: Model
@@ -66,17 +67,38 @@ export class MistralAIService {
       temperature?: number
     } & {model?: AvailableMistralModels},
   ): Promise<string> {
-    const completionsParams: components.ChatCompletionRequest = {
-      maxTokens,
-      messages: [{content: prompt, role: 'user'}],
-      model,
-      responseFormat: {
-        type: 'json_object',
-      },
-      temperature,
-    }
+    return startActiveObservation('mistralai.complete', async (span) => {
+      const completionsParams: components.ChatCompletionRequest = {
+        maxTokens,
+        messages: [{content: prompt, role: 'user'}],
+        model,
+        responseFormat: {
+          type: 'json_object',
+        },
+        temperature,
+      }
 
-    return this.completion(completionsParams)
+      span.update({
+        input: {
+          model,
+          maxTokens,
+          temperature,
+          promptLength: prompt.length,
+        },
+      })
+
+      try {
+        const result = await this.completion(completionsParams)
+        span.update({
+          output: {
+            resultLength: result.length,
+          },
+        })
+        return result
+      } catch (error) {
+        throw error
+      }
+    })
   }
 
   async parse<T extends z.ZodTypeAny>(
@@ -93,58 +115,101 @@ export class MistralAIService {
       temperature?: number
     } & {model?: AvailableMistralModels} = {},
   ): Promise<z.infer<T>> {
-    const parsedRequest: ParsedChatCompletionRequest<T> = {
-      maxTokens,
-      messages: [{content: prompt, role: 'user'}],
-      model,
-      responseFormat: schema,
-      temperature,
-    }
+    return startActiveObservation('mistralai.parse', async (span) => {
+      const parsedRequest: ParsedChatCompletionRequest<T> = {
+        maxTokens,
+        messages: [{content: prompt, role: 'user'}],
+        model,
+        responseFormat: schema,
+        temperature,
+      }
 
-    const completion = await this.client.chat.parse(parsedRequest)
+      span.update({
+        input: {
+          model,
+          maxTokens,
+          temperature,
+          promptLength: prompt.length,
+        },
+      })
 
-    if (!completion.choices || completion.choices.length === 0) {
-      throw new Error('Mistral AI returned no choices')
-    }
+      try {
+        const completion = await this.client.chat.parse(parsedRequest)
 
-    const parsed = completion.choices[0]?.message?.parsed
+        if (!completion.choices || completion.choices.length === 0) {
+          throw new Error('Mistral AI returned no choices')
+        }
 
-    if (!parsed) {
-      throw new Error('Mistral AI returned an empty parsed answer')
-    }
+        const parsed = completion.choices[0]?.message?.parsed
 
-    if (!completion.usage) {
-      throw new Error('Mistral AI returned an empty usage object')
-    }
+        if (!parsed) {
+          throw new Error('Mistral AI returned an empty parsed answer')
+        }
 
-    return parsed
+        if (!completion.usage) {
+          throw new Error('Mistral AI returned an empty usage object')
+        }
+
+        span.update({
+          output: {
+            usage: completion.usage,
+          },
+        })
+
+        return parsed
+      } catch (error) {
+        throw error
+      }
+    })
   }
 
   private async completion(params: components.ChatCompletionRequest) {
-    const completion = await this.client.chat.complete(params)
+    return startActiveObservation('mistralai.completion', async (span) => {
+      span.update({
+        input: {
+          model: params.model,
+          maxTokens: params.maxTokens,
+          temperature: params.temperature,
+          messagesCount: params.messages?.length || 0,
+        },
+      })
 
-    const content = completion.choices[0]?.message?.content
+      try {
+        const completion = await this.client.chat.complete(params)
 
-    if (!content) {
-      throw new Error('Mistral AI returned an empty answer')
-    }
+        const content = completion.choices[0]?.message?.content
 
-    const answer =
-      typeof content === 'string'
-        ? content
-        : content
-            .filter((chunk): chunk is components.TextChunk & {type: 'text'} => chunk.type === 'text')
-            .map((chunk) => chunk.text)
-            .join('')
+        if (!content) {
+          throw new Error('Mistral AI returned an empty answer')
+        }
 
-    if (!answer) {
-      throw new Error('Mistral AI returned an empty answer')
-    }
+        const answer =
+          typeof content === 'string'
+            ? content
+            : content
+                .filter((chunk): chunk is components.TextChunk & {type: 'text'} => chunk.type === 'text')
+                .map((chunk) => chunk.text)
+                .join('')
 
-    if (!completion.usage) {
-      throw new Error('Mistral AI returned an empty usage object')
-    }
+        if (!answer) {
+          throw new Error('Mistral AI returned an empty answer')
+        }
 
-    return answer
+        if (!completion.usage) {
+          throw new Error('Mistral AI returned an empty usage object')
+        }
+
+        span.update({
+          output: {
+            answerLength: answer.length,
+            usage: completion.usage,
+          },
+        })
+
+        return answer
+      } catch (error) {
+        throw error
+      }
+    })
   }
 }
