@@ -13,6 +13,9 @@ import {
 import {Person} from '../domain/person.js'
 import {ThrottleFunction} from '../services/notion.backend.js'
 
+import createDebug from 'debug'
+const debug = createDebug('organization:repository')
+
 export const database_id = '2b43368090ff4153bc4896d7a1abdc94'
 
 export async function searchOrganizationsByName(
@@ -44,7 +47,7 @@ export const fetchOrganizationById = async (
   throttle: ThrottleFunction,
   id: string,
 ): Promise<Organization> => {
-  console.debug(`🏗️ Fetching Organization with id ${id}...`)
+  debug(`🏗️ Fetching Organization with id ${id}...`)
 
   const response = await throttle(() =>
     backend.pages.retrieve({

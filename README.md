@@ -32,10 +32,11 @@ USAGE
 
 <!-- commands -->
 * [`canape contract ID`](#canape-contract-id)
+* [`canape deal create`](#canape-deal-create)
+* [`canape deal magically-create`](#canape-deal-magically-create)
 * [`canape help [COMMAND]`](#canape-help-command)
 * [`canape mailchimp`](#canape-mailchimp)
-* [`canape new-deals`](#canape-new-deals)
-* [`canape new-organization`](#canape-new-organization)
+* [`canape organization create`](#canape-organization-create)
 * [`canape plugins`](#canape-plugins)
 * [`canape plugins add PLUGIN`](#canape-plugins-add-plugin)
 * [`canape plugins:inspect PLUGIN...`](#canape-pluginsinspect-plugin)
@@ -72,6 +73,34 @@ EXAMPLES
 ```
 
 _See code: [src/commands/contract/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/contract/index.ts)_
+
+## `canape deal create`
+
+Create a new deal in Notion
+
+```
+USAGE
+  $ canape deal create
+
+DESCRIPTION
+  Create a new deal in Notion
+```
+
+_See code: [src/commands/deal/create.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/deal/create.ts)_
+
+## `canape deal magically-create`
+
+Crawls the inbox for new deals and creates them in Notion
+
+```
+USAGE
+  $ canape deal magically-create
+
+DESCRIPTION
+  Crawls the inbox for new deals and creates them in Notion
+```
+
+_See code: [src/commands/deal/magically-create.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/deal/magically-create.ts)_
 
 ## `canape help [COMMAND]`
 
@@ -110,33 +139,19 @@ EXAMPLES
 
 _See code: [src/commands/mailchimp/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/mailchimp/index.ts)_
 
-## `canape new-deals`
-
-Crawls the inbox for new deals and creates them in Notion
-
-```
-USAGE
-  $ canape new-deals
-
-DESCRIPTION
-  Crawls the inbox for new deals and creates them in Notion
-```
-
-_See code: [src/commands/new-deals/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/new-deals/index.ts)_
-
-## `canape new-organization`
+## `canape organization create`
 
 Create a new organization in Notion
 
 ```
 USAGE
-  $ canape new-organization
+  $ canape organization create
 
 DESCRIPTION
   Create a new organization in Notion
 ```
 
-_See code: [src/commands/new-organization/index.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/new-organization/index.ts)_
+_See code: [src/commands/organization/create.ts](https://github.com/xbill82/canape-cli/blob/v0.0.0/src/commands/organization/create.ts)_
 
 ## `canape plugins`
 

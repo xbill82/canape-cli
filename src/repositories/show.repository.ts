@@ -4,6 +4,9 @@ import {PageObjectResponse, QueryDatabaseParameters} from '@notionhq/client/buil
 import {Show} from '../domain/show.js'
 import {ThrottleFunction} from '../services/notion.backend.js'
 
+import createDebug from 'debug'
+const debug = createDebug('show:repository')
+
 // TODO: Replace with actual show database ID from Notion
 export const database_id = 'ca3d9449a5b14e11a41d4b051085e8b8'
 
@@ -33,14 +36,12 @@ export async function searchShowsByTitle(
 }
 
 export const fetchShowById = async (backend: Client, throttle: ThrottleFunction, id: string): Promise<Show> => {
-  console.debug(`🏗️ Fetching Show with id ${id}...`)
+  debug(`🏗️ Fetching Show with id ${id}...`)
   const response = await throttle(() =>
     backend.pages.retrieve({
       page_id: id,
     }),
   )
-
-  // console.debug(JSON.stringify(response, null, 2))
 
   return new Show(response as PageObjectResponse)
 }

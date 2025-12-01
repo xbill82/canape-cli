@@ -19,6 +19,7 @@
     "@types/rc": "^1.2.4",
     "axios": "^1.7.7",
     "dayjs": "^1.11.12",
+    "debug": "^4.4.3",
     "handlebars": "^4.7.8",
     "handlebars-helpers": "^0.10.0",
     "imap-simple": "^5.1.0",
@@ -35,6 +36,7 @@
     "@oclif/prettier-config": "^0.2.1",
     "@oclif/test": "^4",
     "@types/chai": "^4",
+    "@types/debug": "^4.1.12",
     "@types/imap-simple": "^4.2.9",
     "@types/mailchimp__mailchimp_marketing": "^3.0.20",
     "@types/mailparser": "^3.4.4",
@@ -69,7 +71,7 @@
   "oclif": {
     "bin": "canape",
     "dirname": "canape",
-    "commands": "./src/commands",
+    "commands": "./dist/commands",
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/plugin-plugins"

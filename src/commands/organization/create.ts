@@ -12,7 +12,7 @@ import OrganizationService from '../../services/organization.service.js'
 import PersonService from '../../services/person.service.js'
 import {updateOrganizationWithPerson} from '../../repositories/organization.repository.js'
 
-export default class NewOrganization extends Command {
+export default class CreateOrganization extends Command {
   static description = 'Create a new organization in Notion'
 
   async run(): Promise<void> {

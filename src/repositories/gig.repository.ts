@@ -5,7 +5,9 @@ import {Gig, GigRelations} from '../domain/gig.js'
 import {Show} from '../domain/show.js'
 import {ThrottleFunction, findPropertyById} from '../services/notion.backend.js'
 import {fetchShowById} from './show.repository.js'
-import {title} from 'process'
+
+import createDebug from 'debug'
+const debug = createDebug('gig:repository')
 
 const showKeyId = '%2F7eo'
 export const database_id = '13b920e1f55247fb9a7708a9c29faaa7'
@@ -21,15 +23,13 @@ export type CreateGigData = {
 }
 
 export const fetchGigById = async (backend: Client, throttle: ThrottleFunction, id: string): Promise<Gig> => {
-  console.debug(`🏗️ Fetching Gig with id ${id}...`)
+  debug(`🏗️ Fetching Gig with id ${id}...`)
   const response: PageObjectResponse = await throttle(
     () =>
       backend.pages.retrieve({
         page_id: id,
       }) as Promise<PageObjectResponse>,
   )
-
-  // console.debug(JSON.stringify(response, null, 2))
 
   const relations: GigRelations = {
     show: undefined,

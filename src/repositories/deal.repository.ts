@@ -10,16 +10,17 @@ const gigsKeyId = '%3E%5BC%60'
 const organizationKeyId = '%60pci'
 export const database_id = 'fa11369600934541bd62329dcad2ec16'
 
+import createDebug from 'debug'
+const debug = createDebug('deal:repository')
+
 export const fetchDealById = async (backend: Client, throttle: ThrottleFunction, id: string): Promise<Deal> => {
-  console.debug(`🏗️ Fetching Deal with id ${id}...`)
+  debug(`🏗️ Fetching Deal with id ${id}...`)
   const response: PageObjectResponse = await throttle(
     () =>
       backend.pages.retrieve({
         page_id: id,
       }) as Promise<PageObjectResponse>,
   )
-
-  // console.debug(JSON.stringify(response, null, 2))
 
   const relations: DealRelations = {
     gigs: undefined,
