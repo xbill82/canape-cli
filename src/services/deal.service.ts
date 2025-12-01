@@ -246,7 +246,12 @@ export default class DealService {
           licenceNumber:
             'licenceNumber' in input.organizer ? (input.organizer.licenceNumber as number | undefined) : undefined,
           website: 'website' in input.organizer ? (input.organizer.website as string | undefined) : undefined,
-          type: 'type' in input.organizer ? (input.organizer.type as string[] | undefined) : undefined,
+          type:
+            'type' in input.organizer && input.organizer.type
+              ? typeof input.organizer.type === 'string'
+                ? [input.organizer.type]
+                : (input.organizer.type as string[])
+              : undefined,
           facturationProId: undefined,
         } as Organization
 
