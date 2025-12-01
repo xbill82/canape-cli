@@ -1,4 +1,5 @@
 import {Client} from '@notionhq/client'
+import {z} from 'zod'
 import {ThrottleFunction} from './notion.backend.js'
 import {search} from '@inquirer/prompts'
 import confirm from '@inquirer/confirm'
@@ -55,6 +56,49 @@ export type CreateDealInput = {
     gigTitle?: string
   }
 }
+
+export const CreateDealInputSchema = z.object({
+  dealTitle: z.string().describe('Le titre du deal/devis'),
+  organizer: z
+    .object({
+      name: z.string().describe("Le nom de l'entité pour laquelle travaille l'expéditeur"),
+      email: z.string().describe("L'email de l'organisation (format email valide)"),
+      address: z.string().optional().describe("L'adresse de l'organisation"),
+      website: z.string().optional().describe("Le site web de l'organisation"),
+      type: z
+        .string()
+        .optional()
+        .describe(
+          "Le type d'organisation. Choisis entre Médiathèque, Boite de prod, Ecole, Théâtre, Office du Tourisme, Mairie, Association, Communauté de Communes, MJC, Université",
+        ),
+    })
+    .describe("L'organisation qui organise l'événement"),
+  decisionMaker: z
+    .object({
+      name: z.string().describe("Le nom de l'expéditeur"),
+      email: z.string().describe("L'email de l'expéditeur (format email valide)"),
+      phoneNumber: z.string().optional().describe("Le numéro de téléphone de l'expéditeur"),
+    })
+    .optional()
+    .describe("La personne décisionnaire (l'expéditeur du mail)"),
+  gig: z
+    .object({
+      show: z
+        .object({
+          title: z
+            .string()
+            .describe(
+              "Le nom du spectacle demandé, choisis entre La Danse des Sorcières, L'Art de Rater le Train, La Risotto Experience, Le Voyage en Europe",
+            ),
+        })
+        .describe('Le spectacle demandé'),
+      timestamp: z.string().describe('La date du spectacle demandé (format YYYY-MM-DD ou YYYY-MM-DDTHH:mm)'),
+      city: z.string().optional().describe('La ville dans laquelle se passera la représentation demandée'),
+      gigTitle: z.string().optional().describe('Le titre du gig (optionnel, sera généré si absent)'),
+    })
+    .optional()
+    .describe('Les informations sur le spectacle/gig'),
+})
 
 export default class DealService {
   private backend: Client

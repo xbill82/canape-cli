@@ -10,6 +10,7 @@
   "dependencies": {
     "@inquirer/prompts": "^7.10.0",
     "@mailchimp/mailchimp_marketing": "^3.0.80",
+    "@mistralai/mistralai": "^1.10.0",
     "@notionhq/client": "^2.2.15",
     "@oclif/core": "^4",
     "@oclif/plugin-help": "^6",
